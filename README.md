@@ -15,3 +15,9 @@ Using past sleep data, activity levels, and external factors, the system:
 - Provides notifications for wind-down routines.
 - Suggests environmental improvements (light, temperature, noise).
 - Reinforces habits using streak tracking and personalized recommendations.
+
+(pandas installs numpy)
+pip install pandas 
+pip install scikit-learn
+pip install xgboost
+pip install ridgeplot
