@@ -10,22 +10,22 @@
   "is_world_process_zero": true,
   "log_history": [
     {
-      "entropy": 1.5255807936191559,
+      "entropy": 1.5245770514011383,
       "epoch": 0.8,
-      "grad_norm": 1.2723875045776367,
+      "grad_norm": 1.2482227087020874,
       "learning_rate": 0.0002,
       "loss": 2.6292,
-      "mean_token_accuracy": 0.46886173635721207,
+      "mean_token_accuracy": 0.4663839414715767,
       "num_tokens": 849.0,
       "step": 1
     },
     {
-      "entropy": 1.705446481704712,
+      "entropy": 1.7052007913589478,
       "epoch": 1.0,
-      "grad_norm": 1.3528112173080444,
+      "grad_norm": 1.3286631107330322,
       "learning_rate": 0.0001666666666666667,
       "loss": 2.5195,
-      "mean_token_accuracy": 0.47058823704719543,
+      "mean_token_accuracy": 0.46606335043907166,
       "num_tokens": 1071.0,
       "step": 2
     }

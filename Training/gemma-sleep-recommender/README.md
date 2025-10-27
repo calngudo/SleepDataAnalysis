@@ -2,10 +2,13 @@
 library_name: peft
 model_name: gemma-sleep-recommender
 tags:
-- generated_from_trainer
+- base_model:adapter:./basegemma
+- lora
 - sft
+- transformers
 - trl
 licence: license
+pipeline_tag: text-generation
 base_model: ./basegemma
 ---
 
@@ -34,10 +37,10 @@ This model was trained with SFT.
 
 ### Framework versions
 
-- PEFT 0.11.1
+- PEFT 0.17.1
 - TRL: 0.24.0
 - Transformers: 4.57.1
-- Pytorch: 2.4.1+cu121
+- Pytorch: 2.5.1+cu121
 - Datasets: 4.3.0
 - Tokenizers: 0.22.1
 
