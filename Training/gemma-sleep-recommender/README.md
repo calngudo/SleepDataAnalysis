@@ -8,8 +8,8 @@ tags:
 - transformers
 - trl
 licence: license
-pipeline_tag: text-generation
 base_model: ./basegemma
+pipeline_tag: text-generation
 ---
 
 # Model Card for gemma-sleep-recommender
