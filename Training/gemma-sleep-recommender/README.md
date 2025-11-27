@@ -2,13 +2,13 @@
 library_name: peft
 model_name: gemma-sleep-recommender
 tags:
-- base_model:adapter:./basegemma
+- base_model:adapter:./gemma2-2b
 - lora
 - sft
 - transformers
 - trl
 licence: license
-base_model: ./basegemma
+base_model: ./gemma2-2b
 pipeline_tag: text-generation
 ---
 

@@ -13,7 +13,7 @@ print("Merging adapters into base model...")
 model = model.merge_and_unload()
 
 print("Loading tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained("./basegemma")
+tokenizer = AutoTokenizer.from_pretrained("./gemma2-2b")
 
 print("Saving merged model...")
 model.save_pretrained("gemma-sleep-merged")
