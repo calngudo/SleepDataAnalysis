@@ -11,7 +11,7 @@ import os
 # --- 1. Your Training Data ---
 # This section has been changed to load data from the text file.
 # The original 'training_data' list has been removed.
-dataset = load_dataset("json", data_files="dataset.txt", split="train")
+dataset = load_dataset("json", data_files="dataset3.txt", split="train")
 
 
 # --- 2. Load Model & Tokenizer from LOCAL PATH ---
