@@ -1,0 +1,7 @@
+<bos><start_of_turn>user
+Hello!<end_of_turn>
+<start_of_turn>model
+Hey there!<end_of_turn>
+<start_of_turn>user
+What is 1+1?<end_of_turn>
+<start_of_turn>model\n

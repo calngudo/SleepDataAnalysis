@@ -1,3 +1,9 @@
+DATASET = "dataset3.txt"
+MODEL = "./gemma2-2b"
+output_dir = "gemma-sleep-recommender"
+
+
+
 import torch
 from datasets import load_dataset, Dataset
 from peft import LoraConfig, AutoPeftModelForCausalLM
@@ -7,10 +13,9 @@ from trl import SFTConfig
 import os
 
 #Dataset Loader
-dataset = load_dataset("json", data_files="dataset3.txt", split="train")
+dataset = load_dataset("json", data_files=DATASET, split="train")
 #Base Model Loader
-model_id = "./gemma2-2b"
-
+model_id = MODEL
 
 #Training Settings
 bnb_config = BitsAndBytesConfig(
@@ -44,7 +49,7 @@ lora_config = LoraConfig(
 )
 
 
-output_dir = "gemma-sleep-recommender"
+
 sft_config = SFTConfig(
     output_dir=output_dir,
     num_train_epochs=3,
