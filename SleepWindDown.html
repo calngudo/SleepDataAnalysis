@@ -351,7 +351,13 @@
             if (!aiEngine) return "AI Not Loaded";
             
             // Craft prompt
-            const prompt = `A user's weekly health summary is as follows:\n* Average Sleep Score ${data.sleepScore}\n* Average Sleep Duration: ${data.sleepDuration}\n* Average Stress Level: ${data.stressLevel}\n* Average Daily Steps: ${data.stepCount}\n* Average Bedtime: ${data.bedtime}\n\nBased on this data, what is your sleep recommendation? Keep it short and actionable.`;
+            const prompt = `A user's weekly health summary is as follows:\n
+                            * Average Sleep Score ${data.sleepScore}\n
+                            * Average Sleep Duration: ${data.sleepDuration}\n
+                            * Average Stress Level: ${data.stressLevel}\n
+                            * Average Daily Steps: ${data.stepCount}\n
+                            * Average Bedtime: ${data.bedtime}\n\n
+                            Based on this data, what is your sleep recommendation? Keep it short and actionable.`;
             
             try {
                 const response = await aiEngine.chat.completions.create({
@@ -428,7 +434,7 @@
             else if (data.sleepScore < 60) quality = 'Poor';
             document.getElementById('dispQuality').textContent = quality;
 
-            // 3. AI Interaction
+            // Loading
             if (!window.isAIReady()) {
                 alert("Please wait for the AI Model to finish loading.");
                 return;
