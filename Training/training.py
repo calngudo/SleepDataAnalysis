@@ -1,3 +1,5 @@
+###NOTE: THIS CODE WILL NOT WORK WITHOUT THE BASE MODEL GEMMA 2 2B
+
 DATASET = "dataset3.txt"
 MODEL = "./gemma2-2b"
 output_dir = "gemma-sleep-recommender"
