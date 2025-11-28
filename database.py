@@ -7,9 +7,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database configuration
-DATABASE_URL = f"postgresql+psycopg2://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', 'password')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'sleep_analysis')}"
-engine = create_engine(DATABASE_URL)
+
+#DATABASE_URL = f"postgresql+psycopg2://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', 'password')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'sleep_analysis')}"
+#engine = create_engine(DATABASE_URL)
+engine = create_engine('sqlite:///sleep_data.db') # Using SQLite
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
 
