@@ -1,4 +1,4 @@
-name: Deploy to Azure Web App
+name: Deploy SleepWindDown HTML
 
 on:
   push:
@@ -9,24 +9,24 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Set up Node.js 20 LTS
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-    
-    - name: Install and build
+
+    - name: Create package folder
       run: |
-        cd 'CP317 Demo/sleep-insights-app'
-        npm install
-        npm run build
-    
+        mkdir -p deploy_pkg
+        cp "SleepWindDown.html" deploy_pkg/
+
+    - name: Zip package
+      run: |
+        cd deploy_pkg
+        zip -r ../sleepwinddown.zip .
+        cd ..
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'sleepdataanylsis'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: 'CP317 Demo/sleep-insights-app/dist'
+        package: 'sleepwinddown.zip'
