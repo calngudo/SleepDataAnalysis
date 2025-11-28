@@ -299,29 +299,29 @@
             try {
                 updateAIStatus('loading', 'Loading Model...');
                 
-                // Ran into many problems attempting to get the correct WASM
-                // Ended up dynamically searching for matching versions
+                // 1. DYNAMICALLY GET LOCAL URL
+                // Get the current page URL, remove the filename, and point to the model folder
+                const appPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                const localModelPath = appPath + "Gemma-SleepAnalysisDataMLC";
+
+                console.log("Attempting to load model from:", localModelPath);
+
+                // 2. DEFINE WASM (Keep this as the remote GitHub URL or your local file if you downloaded it)
                 const libUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/";
                 const libVersion = webllm.modelVersion;
-
-                // Construct WASM URL
                 const wasmFileName = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
                 const modelLibUrl = `${libUrl}${libVersion}/${wasmFileName}`;
 
-                // Log crafted URL
-                console.log("Using WASM:", modelLibUrl);
-
-                // Create model
+                // 3. CONFIGURE MODEL
                 const model = {
-                    model: "http://localhost:8080/Gemma-SleepAnalysisDataMLC/", 
+                    model: localModelPath, // USES THE FULL URL CALCULATED ABOVE
                     model_id: "Gemma-SleepAnalysisDataMLC",
                     model_lib: modelLibUrl,
-                    vram_required_MB: 2048,
-                    // Change this
-                    low_resource_required: false,
+                    vram_required_MB: 512,
+                    low_resource_required: true,
                 };   
 
-                // Initialize WebLLM engine
+                // 4. CREATE ENGINE
                 aiEngine = await webllm.CreateMLCEngine(
                     "Gemma-SleepAnalysisDataMLC",
                     {
@@ -333,7 +333,6 @@
                     }
                 );
                 
-                // Update status
                 aiReadyState = true;
                 updateAIStatus('ready', 'AI Ready');
                 console.log("WebLLM Engine Initialized Successfully");
@@ -341,6 +340,7 @@
             } catch (error) {
                 console.error('AI Init Error:', error);
                 updateAIStatus('error', 'AI Load Failed');
+                alert("Error: " + error.message + "\n\nMake sure you are running this on a Local Server (http://localhost), not as a file.");
             }
         }
 
