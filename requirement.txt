@@ -1,1 +1,27 @@
+# Web Framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+Werkzeug==2.3.7
+
+# Database & ORM
+SQLAlchemy==2.0.21
+python-dotenv==1.0.0
+
+# Data Processing & ML
+pandas==2.1.1
+numpy==1.24.3
+scikit-learn==1.3.1
+xgboost==2.0.0
+ridgeplot==0.1.4
+matplotlib==3.8.1
+
+# Production Server
+gunicorn==21.2.0
+
+# Azure Integration
+azure-identity==1.14.0
+azure-storage-blob==12.18.0
+
+# Utilities
+requests==2.31.0
 
