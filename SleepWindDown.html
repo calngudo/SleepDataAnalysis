@@ -37,7 +37,7 @@
         }
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 2fr auto;
             gap: 20px;
             margin-top: 20px;
             align-items: start;
@@ -49,6 +49,10 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .left-column {
+            display: grid;
+            gap: 20px;
+        }
+        .right-column {
             display: grid;
             gap: 20px;
         }
@@ -176,6 +180,42 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
+        /* Wind Down Timer Box */
+        .wind-down-duration {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+            height: fit-content;
+        }
+        .wind-down-duration h3 {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .wind-down-duration .wind-down-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007aff;
+            margin: 0;
+        }
+        .wind-down-duration .wind-down-unit {
+            font-size: 14px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .wind-down-duration .wind-down-explainer {
+            font-size: 10px;
+            color: #007aff;
+            margin-top: 4px;
+        }
+
+
+
         @media (max-width: 900px) {
             .main-content { grid-template-columns: 1fr; }
         }
@@ -273,6 +313,23 @@
                             <p>Adjust the sliders and click "Generate" to receive personalized advice from your local Gemma 2 model.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Wind Down Boxes -->
+            <div class="right-column">
+                <div class="wind-down-duration" id="windDownBox">
+                    <h3>Wind Down</h3>
+                    <p class="wind-down-value" id="dispWindDownTime">--</p>
+                    <p class="wind-down-unit">Minutes</p>
+                    <p class="wind-down-explainer">(Model Recommended)</p>
+                </div>
+
+                <div class="wind-down-duration" id="windDownStartBox">
+                    <h3>Start At</h3>
+                    <p class="wind-down-value" id="dispWindDownStart">--</p>
+                    <p class="wind-down-unit">Time</p>
+                    <p class="wind-down-explainer">(Model Recommended)</p>
                 </div>
             </div>
         </div>
@@ -395,7 +452,7 @@
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [{
                         label: 'Duration (Hours)',
-                        data: [6.5, 7, 6.8, 7.5, 8, 8.5, 7.5], // Dummy data
+                        data: [0, 0, 0, 0, 0, 0, 0], 
                         backgroundColor: 'rgba(0, 122, 255, 0.6)',
                         borderRadius: 4
                     }]
@@ -407,6 +464,20 @@
                 }
             });
         }
+
+        function tConvert (time) {
+  
+  time = time.toString ().match (/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+  if (time.length > 1) { 
+    time = time.slice (1);  
+    time[5] = +time[0] < 12 ? 'AM' : 'PM'; 
+    time[0] = +time[0] % 12 || 12; 
+  }
+  return time.join (''); // return adjusted time or original string
+}
+
+
         document.addEventListener('DOMContentLoaded', initCharts);
 
         // Form submission
@@ -434,6 +505,11 @@
             else if (data.sleepScore < 60) quality = 'Poor';
             document.getElementById('dispQuality').textContent = quality;
 
+            //Chart update
+            const daynametoday = new Date().getDay();
+            weeklyChart.data.datasets[0].data[daynametoday === 0 ? 6 : daynametoday - 1] = parseFloat(data.sleepDuration);
+            weeklyChart.update();
+
             // Loading
             if (!window.isAIReady()) {
                 alert("Please wait for the AI Model to finish loading.");
@@ -447,25 +523,57 @@
             try {
                 const result = await window.analyzeSleepData(data);
                 
-                // Trying to parse raw .json data from result into variables
-                // Needs more work
-
-                // const parsed = JSON.parse(cleanResult);
-
-                // const bedtimeRating = parsed["Bedtime Rating"];
-                // const stepRating = parsed["Step Rating"];
-                // const recBedTime = parsed["Recommended Bed Time"];
-                // const recStepCount = parsed["Recommended Daily Step"];
-                // const windDownMinutes = parsed["Recommended Wind Down Window"];
-                // const windDownStart = parsed["Recommended Wind Down Time"];
-                // const recSentence = parsed["Recommendation sentence"];
-
-                // Display result
+                // Try to extract JSON from the AI response
+                // The AI might return text with JSON embedded, so we look for { and }
+                let parsed = null;
+                let displayText = result;
+                
+                try {
+                    // First, try to find JSON in the response (between first { and last })
+                    const jsonStart = result.indexOf('{');
+                    const jsonEnd = result.lastIndexOf('}');
+                    
+                    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+                        const jsonString = result.substring(jsonStart, jsonEnd + 1);
+                        parsed = JSON.parse(jsonString);
+                        
+                        // Successfully parsed - extract the values
+                        const bedtimeRating = parsed["Bedtime Rating"];
+                        const stepRating = parsed["Step Rating"];
+                        const recBedTime = parsed["Recommended Bed Time"];
+                        const recStepCount = parsed["Recommended Daily Step"];
+                        const windDownMinutes = parsed["Recommended Wind Down Window"];
+                        const windDownStart = parsed["Recommended Wind Down Time"];
+                        const recSentence = parsed["Recommendation sentence"];
+                        
+                        console.log("Parsed JSON:", parsed);
+                        console.log("Bedtime Rating:", bedtimeRating);
+                        
+                        // Update the wind down timer box
+                        if (windDownMinutes) {
+                            document.getElementById('dispWindDownTime').textContent = windDownMinutes;
+                        }
+                        
+                        // Update the wind down start time box
+                        if (windDownStart) {
+                            document.getElementById('dispWindDownStart').textContent = tConvert(windDownStart);
+                        }
+                        
+                        // Create a formatted display from parsed data
+                        displayText = recSentence || result;
+                    }
+                } catch (parseError) {
+                    console.warn("Could not parse JSON from response:", parseError);
+                    console.log("Raw response:", result);
+                    // Fall back to displaying the raw result
+                }
+                
                 insightsDiv.innerHTML = `
                     <div class="recommendation">
-                        <p><strong>AI Analysis:</strong></p>
-                        <p>${result}</p>
+                    
+                        <p>${displayText}</p>
                     </div>`;
+                console.log("Done");
             } catch (err) {
                 insightsDiv.innerHTML = '<div class="recommendation"><p>Error generating insights.</p></div>';
             }
