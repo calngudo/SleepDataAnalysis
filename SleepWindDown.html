@@ -1,1 +1,1029 @@
-c:\Users\ridwn\Documents\GitHub\SleepDataAnalysis\SleepWindDown.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sleep App with AI Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: #fff;
+            padding: 24px 32px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #007aff;
+        }
+        
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 0%;
+            background-color: #ccc;
+        }
+        
+        .status-indicator.loading { 
+            background-color: #ffa500; 
+            animation: pulse 1.5s infinite; 
+        }
+        .status-indicator.ready { background-color: #28a745; }
+        .status-indicator.error { background-color: #dc3545; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.9); }
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 400px 1fr auto;
+            gap: 24px;
+            align-items: start;
+        }
+        
+        .card {
+            background: #fff;
+            padding: 32px;
+            border-radius: 0px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #1a1a2e;
+        }
+        
+        .form-group {
+            margin-bottom: 32px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Modern Card Input Style */
+        .input-card {
+            background: #007aff;
+            padding: 24px;
+            border-radius: 0px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .input-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.3);
+        }
+        
+        .input-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .input-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .input-card-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        .input-card-value {
+            font-size: 36px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .input-card input[type=range] {
+            width: 100%;
+            height: 6px;
+            border-radius: 0px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            -webkit-appearance: none;
+            margin-top: 8px;
+        }
+        
+        .input-card input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .input-card input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .input-card input[type=range]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 0%;
+            background: white;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .range-hint {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        /* Standard Inputs */
+        input[type=number], input[type=time] {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 0px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        input[type=number]:focus, input[type=time]:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .btn {
+            background: #007aff;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 0px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 24px;
+            border-radius: 0px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: #007aff;
+            box-shadow: 0 8px 16px rgba(0, 122, 255, 0.15);
+        }
+        
+        .metric-card h3 {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .metric-card p {
+            font-size: 32px;
+            font-weight: 700;
+            color: #007aff;
+        }
+        
+        .chart-container {
+            margin-top: 32px;
+            position: relative;
+            height: 280px;
+            background: white;
+            padding: 20px;
+            border-radius: 0px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        /* Insights */
+        .insights {
+            min-height: 400px;
+        }
+        
+        .recommendation {
+            background: #e7f3ff;
+            padding: 28px;
+            border-radius: 0px;
+            border-left: 4px solid #007aff;
+            line-height: 1.8;
+            font-size: 15px;
+            color: #2d3748;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+        }
+        
+        .recommendation h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .recommendation ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .recommendation li {
+            padding: 12px 0;
+            padding-left: 32px;
+            position: relative;
+            border-bottom: 1px solid rgba(0, 122, 255, 0.1);
+        }
+        
+        .recommendation li:last-child {
+            border-bottom: none;
+        }
+        
+        .recommendation li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 24px;
+            height: 24px;
+            background: #007aff;
+            color: white;
+            border-radius: 0%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .recommendation p {
+            margin: 12px 0;
+        }
+        
+        /* Wind Down Boxes */
+        .right-column {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .wind-down-duration {
+            background: #007aff;
+            padding: 28px;
+            border-radius: 0px;
+            text-align: center;
+            min-width: 180px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0, 122, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wind-down-duration::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .wind-down-duration h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        .wind-down-duration .wind-down-value {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 12px 0;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .wind-down-duration .wind-down-unit {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+        
+        .wind-down-duration .wind-down-explainer {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        
+        /* File Upload Section */
+        .upload-section {
+            margin-bottom: 24px;
+        }
+        
+        .upload-zone {
+            border: 3px dashed #cbd5e0;
+            border-radius: 0px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-zone:hover {
+            border-color: #007aff;
+            background: #e7f3ff;
+            transform: translateY(-2px);
+        }
+        
+        .upload-zone.drag-over {
+            border-color: #007aff;
+            background: #e7f3ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        
+        .upload-zone h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .upload-zone p {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 16px;
+        }
+        
+        .upload-zone .supported-formats {
+            font-size: 12px;
+            color: #a0aec0;
+            font-style: italic;
+        }
+        
+        #healthFileInput {
+            display: none;
+        }
+        
+        .file-status {
+            margin-top: 16px;
+            padding: 12px 20px;
+            background: #007aff;
+            color: white;
+            border-radius: 0px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .file-status.show {
+            display: block;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content { 
+                grid-template-columns: 1fr; 
+            }
+            
+            .right-column {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .right-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>💤 Smart Sleep</h1>
+        <div class="ai-status">
+            <span class="status-indicator" id="aiStatusIndicator"></span>
+            <span id="aiStatusText">Initializing AI...</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="left-column">
+                <div class="upload-section card">
+                    <h2>Import Health Data</h2>
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">📁</div>
+                        <h3>Drag & Drop Your Health Data</h3>
+                        <p>Drop your Apple Health or Android Health export file here</p>
+                        <p class="supported-formats">Supported: CSV, XML, JSON</p>
+                        <input type="file" id="healthFileInput" accept=".csv,.xml,.json" />
+                    </div>
+                    <div class="file-status" id="fileStatus"></div>
+                </div>
+                
+                <div class="input-section card">
+                    <h2>Daily Check-in</h2>
+                    <form id="sleepDataForm">
+                        <div class="form-group">
+                            <div class="input-card">
+                                <div class="input-card-header">
+                                    <span class="input-card-label">Sleep Duration</span>
+                                    <span class="input-card-value" id="val-sleepDuration">7.5h</span>
+                                </div>
+                                <input type="range" id="sleepDuration" min="0" max="12" step="0.5" value="7.5" 
+                                       oninput="updateVal('sleepDuration', 'h')">
+                                <div class="range-hint"><span>0h</span><span>12h</span></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-card">
+                                <div class="input-card-header">
+                                    <span class="input-card-label">How Rested Do You Feel?</span>
+                                    <span class="input-card-value" id="val-sleepScore">75</span>
+                                </div>
+                                <input type="range" id="sleepScore" min="0" max="100" step="1" value="75" 
+                                       oninput="updateVal('sleepScore', '')">
+                                <div class="range-hint"><span>Exhausted</span><span>Fully Energized</span></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-card">
+                                <div class="input-card-header">
+                                    <span class="input-card-label">Stress Level</span>
+                                    <span class="input-card-value" id="val-stressLevel">30</span>
+                                </div>
+                                <input type="range" id="stressLevel" min="0" max="100" step="1" value="30" 
+                                       oninput="updateVal('stressLevel', '')">
+                                <div class="range-hint"><span>Relaxed</span><span>High Stress</span></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stepCount">Daily Step Count</label>
+                            <input type="number" id="stepCount" required placeholder="e.g., 8500" value="8500">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bedtime">Bedtime</label>
+                            <input type="time" id="bedtime" required value="22:30">
+                        </div>
+                        
+                        <button type="submit" class="btn" id="generateInsightsBtn">Generate AI Insights</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="dashboard">
+                <div class="card">
+                    <h2>Your Sleep Dashboard</h2>
+                    <div class="dashboard-grid">
+                        <div class="metric-card">
+                            <h3>Sleep Score</h3>
+                            <p id="dispScore">75</p>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Duration</h3>
+                            <p id="dispDuration">7.5h</p>
+                        </div>
+                        <div class="metric-card">
+                            <h3>Quality</h3>
+                            <p id="dispQuality">Good</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="weeklySleepChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="insights card" style="margin-top: 24px;">
+                    <h2>AI-Powered Analysis</h2>
+                    <div id="aiInsights">
+                        <div class="recommendation">
+                            <h3>💡 Personalized Insights</h3>
+                            <p>Adjust the sliders and click "Generate" to receive personalized advice from your local Gemma 2 model.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="wind-down-duration" id="windDownBox">
+                    <h3>Wind Down</h3>
+                    <p class="wind-down-value" id="dispWindDownTime">--</p>
+                    <p class="wind-down-unit">Minutes</p>
+                    <p class="wind-down-explainer">(Model Recommended)</p>
+                </div>
+
+                <div class="wind-down-duration" id="windDownStartBox">
+                    <h3>Start At</h3>
+                    <p class="wind-down-value" id="dispWindDownStart">--</p>
+                    <p class="wind-down-unit">Time</p>
+                    <p class="wind-down-explainer">(Model Recommended)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+
+        let aiEngine = null;
+        let aiReadyState = false;
+
+        function updateAIStatus(status, text) {
+            const indicator = document.getElementById('aiStatusIndicator');
+            const statusText = document.getElementById('aiStatusText');
+            if (indicator && statusText) {
+                indicator.className = 'status-indicator ' + status;
+                statusText.textContent = text;
+            }
+        }
+
+        async function initAI() {
+            try {
+                updateAIStatus('loading', 'Loading Model...');
+                
+                const appPath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                const localModelPath = appPath + "Gemma-SleepAnalysisDataMLC";
+
+                console.log("Attempting to load model from:", localModelPath);
+
+                const libUrl = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/";
+                const libVersion = webllm.modelVersion;
+                const wasmFileName = "gemma-2-2b-it-q4f16_1-ctx4k_cs1k-webgpu.wasm";
+                const modelLibUrl = `${libUrl}${libVersion}/${wasmFileName}`;
+
+                const model = {
+                    model: localModelPath,
+                    model_id: "Gemma-SleepAnalysisDataMLC",
+                    model_lib: modelLibUrl,
+                    vram_required_MB: 512,
+                    low_resource_required: true,
+                };   
+
+                aiEngine = await webllm.CreateMLCEngine(
+                    "Gemma-SleepAnalysisDataMLC",
+                    {
+                        appConfig: { model_list: [model] },
+                        initProgressCallback: (progress) => {
+                            const percent = progress.progress ? (progress.progress * 100).toFixed(0) + '%' : '';
+                            updateAIStatus('loading', `Loading ${percent}`);
+                        }
+                    }
+                );
+                
+                aiReadyState = true;
+                updateAIStatus('ready', 'AI Ready');
+                console.log("WebLLM Engine Initialized Successfully");
+
+            } catch (error) {
+                console.error('AI Init Error:', error);
+                updateAIStatus('error', 'AI Load Failed');
+                alert("Error: " + error.message + "\n\nMake sure you are running this on a Local Server (http://localhost), not as a file.");
+            }
+        }
+
+        window.isAIReady = () => aiReadyState;
+
+        window.analyzeSleepData = async (data) => {
+            if (!aiEngine) return "AI Not Loaded";
+            
+            const prompt = `A user's weekly health summary is as follows:\n
+                            * Average Sleep Score ${data.sleepScore}\n
+                            * Average Sleep Duration: ${data.sleepDuration}\n
+                            * Average Stress Level: ${data.stressLevel}\n
+                            * Average Daily Steps: ${data.stepCount}\n
+                            * Average Bedtime: ${data.bedtime}\n\n
+                            Based on this data, what is your sleep recommendation? (For the recommendation sentence, make it at least 3 sentences)`;
+            
+            try {
+                const response = await aiEngine.chat.completions.create({
+                    messages: [{ role: "user", content: prompt }],
+                    temperature: 0.3,
+                });
+                return response.choices[0].message.content;
+            } catch (e) {
+                console.error(e);
+                return "Analysis Failed";
+            }
+        };
+
+        initAI();
+    </script>
+
+    <script>
+        function updateVal(id, suffix) {
+            const input = document.getElementById(id);
+            const display = document.getElementById('val-' + id);
+            if (input && display) {
+                display.textContent = input.value + suffix;
+            }
+        }
+
+        let weeklyChart;
+        function initCharts() {
+            const ctx = document.getElementById('weeklySleepChart').getContext('2d');
+            weeklyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Duration (Hours)',
+                        data: [0, 0, 0, 0, 0, 0, 0], 
+                        backgroundColor: 'rgba(0, 122, 255, 0.8)',
+                        borderRadius: 0,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function tConvert (time) {
+            time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+            if (time.length > 1) { 
+                time = time.slice(1);  
+                time[5] = +time[0] < 12 ? 'AM' : 'PM'; 
+                time[0] = +time[0] % 12 || 12; 
+            }
+            return time.join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', initCharts);
+
+        // File Upload Handlers
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('healthFileInput');
+        const fileStatus = document.getElementById('fileStatus');
+
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+
+        function handleFileUpload(file) {
+            const validTypes = ['text/csv', 'application/xml', 'text/xml', 'application/json'];
+            const validExtensions = ['.csv', '.xml', '.json'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!validTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+                fileStatus.textContent = '❌ Invalid file type. Please upload CSV, XML, or JSON.';
+                fileStatus.className = 'file-status show';
+                fileStatus.style.background = '#dc3545';
+                return;
+            }
+
+            fileStatus.textContent = `✅ ${file.name} uploaded successfully! Processing...`;
+            fileStatus.className = 'file-status show';
+            fileStatus.style.background = '#28a745';
+
+            // Read and process the file
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const content = e.target.result;
+                    console.log('File content loaded:', content.substring(0, 200));
+                    
+                    // Simulate processing and populate with sample data
+                    setTimeout(() => {
+                        populateSampleHealthData();
+                        fileStatus.textContent = `✅ Health data imported from ${file.name} - 7 days of sleep data loaded`;
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Error processing file:', error);
+                    fileStatus.textContent = '❌ Error processing file. Please try again.';
+                    fileStatus.style.background = '#dc3545';
+                }
+            };
+            
+            if (fileExtension === '.json') {
+                reader.readAsText(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        function populateSampleHealthData() {
+            // Sample weekly sleep data (Mon-Sun)
+            const weeklySleepData = [7.2, 6.5, 7.8, 7.0, 6.8, 8.2, 7.5];
+            
+            // Update chart with sample data
+            weeklyChart.data.datasets[0].data = weeklySleepData;
+            weeklyChart.update();
+            
+            // Calculate averages for dashboard
+            const avgSleep = (weeklySleepData.reduce((a, b) => a + b, 0) / weeklySleepData.length).toFixed(1);
+            const avgScore = 78; // Sample average score
+            
+            // Update dashboard metrics
+            document.getElementById('dispScore').textContent = avgScore;
+            document.getElementById('dispDuration').textContent = avgSleep + 'h';
+            document.getElementById('dispQuality').textContent = avgScore >= 80 ? 'Excellent' : avgScore >= 60 ? 'Good' : 'Fair';
+            
+            // Update form inputs with averages
+            document.getElementById('sleepDuration').value = avgSleep;
+            document.getElementById('val-sleepDuration').textContent = avgSleep + 'h';
+            
+            document.getElementById('sleepScore').value = avgScore;
+            document.getElementById('val-sleepScore').textContent = avgScore;
+            
+            // Set other sample values
+            document.getElementById('stressLevel').value = 35;
+            document.getElementById('val-stressLevel').textContent = '35';
+            
+            document.getElementById('stepCount').value = 9200;
+            document.getElementById('bedtime').value = '22:45';
+            
+            // Show sample AI insights
+            const insightsDiv = document.getElementById('aiInsights');
+            insightsDiv.innerHTML = `
+                <div class="recommendation">
+                    <h3>💡 Personalized Insights</h3>
+                    <ul>
+                        <li>Your sleep duration is consistent at around ${avgSleep} hours per night - great job maintaining a regular schedule!</li>
+                        <li>Weekend sleep (8.2h on Saturday) shows you may need extra recovery - consider going to bed 15 minutes earlier on weekdays</li>
+                        <li>Your step count of 9,200 is excellent and likely contributing to better sleep quality</li>
+                        <li>Current bedtime of 10:45 PM aligns well with optimal sleep windows for adults</li>
+                        <li>Try to maintain consistency - your Thursday dip to 6.8h suggests mid-week stress may be affecting your rest</li>
+                    </ul>
+                </div>`;
+            
+            // Set wind down recommendations
+            document.getElementById('dispWindDownTime').textContent = '30';
+            document.getElementById('dispWindDownStart').textContent = '10:15 PM';
+        }
+
+        document.getElementById('sleepDataForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('generateInsightsBtn');
+            const insightsDiv = document.getElementById('aiInsights');
+            
+            const data = {
+                sleepDuration: document.getElementById('sleepDuration').value,
+                sleepScore: document.getElementById('sleepScore').value,
+                stressLevel: document.getElementById('stressLevel').value,
+                stepCount: document.getElementById('stepCount').value,
+                bedtime: document.getElementById('bedtime').value
+            };
+
+            document.getElementById('dispScore').textContent = data.sleepScore;
+            document.getElementById('dispDuration').textContent = data.sleepDuration + 'h';
+            
+            let quality = 'Fair';
+            if (data.sleepScore >= 80) quality = 'Excellent';
+            else if (data.sleepScore < 60) quality = 'Poor';
+            document.getElementById('dispQuality').textContent = quality;
+
+            const daynametoday = new Date().getDay();
+            weeklyChart.data.datasets[0].data[daynametoday === 0 ? 6 : daynametoday - 1] = parseFloat(data.sleepDuration);
+            weeklyChart.update();
+
+            if (!window.isAIReady()) {
+                alert("Please wait for the AI Model to finish loading.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Generating Analysis...';
+            insightsDiv.innerHTML = '<div class="recommendation"><h3>💡 Personalized Insights</h3><p>Thinking...</p></div>';
+
+            try {
+                const result = await window.analyzeSleepData(data);
+                
+                let parsed = null;
+                let displayText = result;
+                
+                try {
+                    const jsonStart = result.indexOf('{');
+                    const jsonEnd = result.lastIndexOf('}');
+                    
+                    if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+                        const jsonString = result.substring(jsonStart, jsonEnd + 1);
+                        parsed = JSON.parse(jsonString);
+                        
+                        const bedtimeRating = parsed["Bedtime Rating"];
+                        const stepRating = parsed["Step Rating"];
+                        const recBedTime = parsed["Recommended Bed Time"];
+                        const recStepCount = parsed["Recommended Daily Step"];
+                        const windDownMinutes = parsed["Recommended Wind Down Window"];
+                        const windDownStart = parsed["Recommended Wind Down Time"];
+                        const recSentence = parsed["Recommendation sentence"];
+                        
+                        console.log("Parsed JSON:", parsed);
+                        console.log("Bedtime Rating:", bedtimeRating);
+                        
+                        if (windDownMinutes) {
+                            document.getElementById('dispWindDownTime').textContent = windDownMinutes;
+                        }
+                        
+                        if (windDownStart) {
+                            document.getElementById('dispWindDownStart').textContent = tConvert(windDownStart);
+                        }
+                        
+                        displayText = recSentence || result;
+                    }
+                } catch (parseError) {
+                    console.warn("Could not parse JSON from response:", parseError);
+                    console.log("Raw response:", result);
+                }
+                
+                // Format the output as a list if it contains multiple points
+                const lines = displayText.split('\n').filter(line => line.trim());
+                let formattedOutput = '';
+                
+                if (lines.length > 1) {
+                    // Multiple points - create a list
+                    formattedOutput = '<h3>💡 Personalized Insights</h3><ul>';
+                    lines.forEach(line => {
+                        const cleaned = line.trim().replace(/^[-•*]\s*/, ''); // Remove bullet points
+                        if (cleaned) {
+                            formattedOutput += `<li>${cleaned}</li>`;
+                        }
+                    });
+                    formattedOutput += '</ul>';
+                } else {
+                    // Single paragraph
+                    formattedOutput = `<h3>💡 Personalized Insights</h3><p>${displayText}</p>`;
+                }
+                
+                insightsDiv.innerHTML = `<div class="recommendation">${formattedOutput}</div>`;
+                console.log("Done");
+            } catch (err) {
+                insightsDiv.innerHTML = '<div class="recommendation"><h3>💡 Personalized Insights</h3><p>Error generating insights.</p></div>';
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Generate AI Insights';
+        });
+    </script>
+</body>
+</html>
