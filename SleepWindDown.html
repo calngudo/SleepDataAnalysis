@@ -716,8 +716,7 @@
                             * Average Stress Level: ${data.stressLevel}\n
                             * Average Daily Steps: ${data.stepCount}\n
                             * Average Bedtime: ${data.bedtime}\n\n
-                            Based on this data, what is your sleep recommendation? (For the recommendation sentence, make it at least 3 sentences. Omit the source at the end of the recommendation sentence)
-                            DO NOT WRITE OUT THE SOURCE LINK AT THE END.`;
+                            Based on this data, what is your sleep recommendation? (For the recommendation sentence, make it at least 3 sentences.)`;
             
             try {
                 const response = await aiEngine.chat.completions.create({
