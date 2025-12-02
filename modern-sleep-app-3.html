@@ -646,6 +646,7 @@
     </div>
 
     <script type="module">
+        let db;
         let request = indexedDB.open("sleep_dataV2", 1);
         request.onupgradeneeded = function(event) {
             let db = event.target.result;
@@ -659,8 +660,13 @@
             console.error("IndexedDB error:", event.target.errorCode);
         };
         function saveSleepData(data) {
+            if (!db){
+                console.error("DB not initialized yet");
+                return;
+            }
             let transaction = db.transaction(["sleep_records"], "readwrite");
             let objectStore = transaction.objectStore("sleep_records");
+
             let request = objectStore.add(data);
             request.onsuccess = function(event) {
                 console.log("Saved:", event.target.result);
@@ -669,7 +675,7 @@
                 console.error("Error saving", event.target.errorCode);
             };
         }
-        
+
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
         let aiEngine = null;
