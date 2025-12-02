@@ -646,6 +646,30 @@
     </div>
 
     <script type="module">
+        let request = indexedDB.open("sleep_dataV2", 1);
+        request.onupgradeneeded = function(event) {
+            let db = event.target.result;
+            let objectStore = db.createObjectStore("sleep_records", { keyPath: "id", autoIncrement: true });
+            objectStore.createIndex("date", "date", { unique: false });
+        };
+        request.onsuccess = function(event) {
+            let db = event.target.result;
+        };
+        request.onerror = function(event) {
+            console.error("IndexedDB error:", event.target.errorCode);
+        };
+        function saveSleepData(data) {
+            let transaction = db.transaction(["sleep_records"], "readwrite");
+            let objectStore = transaction.objectStore("sleep_records");
+            let request = objectStore.add(data);
+            request.onsuccess = function(event) {
+                console.log("Saved:", event.target.result);
+            };
+            request.onerror = function(event) {
+                console.error("Error saving", event.target.errorCode);
+            };
+        }
+        
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
         let aiEngine = null;
@@ -933,6 +957,7 @@
                 stepCount: document.getElementById('stepCount').value,
                 bedtime: document.getElementById('bedtime').value
             };
+            saveSleepData(data);
 
             document.getElementById('dispScore').textContent = data.sleepScore;
             document.getElementById('dispDuration').textContent = data.sleepDuration + 'h';
