@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sleep - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: #fff;
+            padding: 48px 40px;
+            border-radius: 0px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 440px;
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo-section h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #007aff;
+            margin-bottom: 8px;
+        }
+        
+        .logo-section p {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #4a5568;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 0px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: #a0aec0;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #007aff;
+        }
+        
+        .checkbox-group label {
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn {
+            background: #007aff;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 0px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+
+        
+        .success-message {
+            background: #e7f3ff;
+            padding: 16px;
+            border-radius: 0px;
+            border-left: 4px solid #007aff;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: #2d3748;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <h1>💤 Smart Sleep</h1>
+            <p>Track, Analyze, Optimize Your Rest</p>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            ✓ Account created successfully! Please log in.
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn">Sign In</button>
+            <button type="button" class="btn" onclick="createAccount()" style="margin-top: 12px;">Create Account</button>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            
+            console.log('Login attempt:', { email, password });
+            
+        
+            const btn = e.target.querySelector('.btn');
+            btn.textContent = 'Signing In...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('Login successful! Welcome to Smart Sleep.');
+                btn.textContent = 'Sign In';
+                btn.disabled = false;
+            }, 1500);
+        });
+        
+        function createAccount() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Check if fields are empty
+            if (!email || !password) {
+                alert('Please fill in both email and password fields.');
+                return;
+            }
+            
+            // Check if email is valid
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+           
+            
+            // If all validations pass, show success
+            document.getElementById('successMessage').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('successMessage').classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
