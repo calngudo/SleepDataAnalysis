@@ -649,18 +649,18 @@
         let db = null;
         let request = indexedDB.open("sleep_dataV2", 1);
         request.onupgradeneeded = function(event) {
-            let db = event.target.result;
+            db = event.target.result;
             let objectStore = db.createObjectStore("sleep_records", { keyPath: "id", autoIncrement: true });
             objectStore.createIndex("date", "date", { unique: false });
         };
         request.onsuccess = function(event) {
-            let db = event.target.result;
+            db = event.target.result;
             loadSleepData();
         };
         request.onerror = function(event) {
             console.error("IndexedDB error:", event.target.errorCode);
         };
-        function saveSleepData(data) {
+        window.saveSleepData = function(data) {
             if (!db){
                 console.error("DB not initialized yet");
                 return;
