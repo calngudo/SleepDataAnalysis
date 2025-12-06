@@ -697,7 +697,18 @@
                 return;
             }
             const recentRecords = allRecords.slice(-7);
-            const sleepDurations = recentRecords.map(record => parseFloat(record.sleepDuration || 0));
+            
+            // Initialize array
+            const sleepDurations = [0, 0, 0, 0, 0, 0, 0];
+         
+            recentRecords.forEach(record => {
+                const recordDate = new Date(record.date);
+                const dayIndex = recordDate.getDay(); // fixed so that it won't put it on the wrong day
+              
+                const chartIndex = dayIndex === 0 ? 6 : dayIndex - 1;
+                sleepDurations[chartIndex] = parseFloat(record.sleepDuration || 0);
+            });
+            
             weeklyChart.data.datasets[0].data = sleepDurations;
             weeklyChart.update();
             
