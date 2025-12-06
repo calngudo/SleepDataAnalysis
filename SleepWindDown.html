@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +29,7 @@
         header {
             background: #fff;
             padding: 24px 32px;
-            border-radius: 16px;
+            border-radius: 20px;
             margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
@@ -48,7 +49,7 @@
             gap: 10px;
             background: #f8f9fa;
             padding: 8px 16px;
-            border-radius: 20px;
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 500;
         }
@@ -56,7 +57,7 @@
         .status-indicator {
             width: 8px;
             height: 8px;
-            border-radius: 50%;
+            border-radius: 0%;
             background-color: #ccc;
         }
         
@@ -82,7 +83,7 @@
         .card {
             background: #fff;
             padding: 32px;
-            border-radius: 20px;
+            border-radius: 0px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
@@ -111,7 +112,7 @@
         .input-card {
             background: #007aff;
             padding: 24px;
-            border-radius: 16px;
+            border-radius: 0px;
             color: white;
             position: relative;
             overflow: hidden;
@@ -159,7 +160,7 @@
         .input-card input[type=range] {
             width: 100%;
             height: 6px;
-            border-radius: 3px;
+            border-radius: 0px;
             background: rgba(255, 255, 255, 0.3);
             outline: none;
             -webkit-appearance: none;
@@ -185,7 +186,7 @@
         .input-card input[type=range]::-moz-range-thumb {
             width: 20px;
             height: 20px;
-            border-radius: 50%;
+            border-radius: 0%;
             background: white;
             cursor: pointer;
             border: none;
@@ -205,7 +206,7 @@
             width: 100%;
             padding: 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 0px;
             font-size: 16px;
             font-weight: 500;
             transition: all 0.2s;
@@ -223,7 +224,7 @@
             color: white;
             padding: 16px 32px;
             border: none;
-            border-radius: 12px;
+            border-radius: 0px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
@@ -262,7 +263,7 @@
         .metric-card {
             background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             padding: 24px;
-            border-radius: 16px;
+            border-radius: 0px;
             text-align: center;
             border: 2px solid #e2e8f0;
             transition: all 0.2s;
@@ -295,7 +296,7 @@
             height: 280px;
             background: white;
             padding: 20px;
-            border-radius: 16px;
+            border-radius: 0px;
             border: 2px solid #e2e8f0;
         }
         
@@ -307,7 +308,7 @@
         .recommendation {
             background: #e7f3ff;
             padding: 28px;
-            border-radius: 16px;
+            border-radius: 0px;
             border-left: 4px solid #007aff;
             line-height: 1.8;
             font-size: 15px;
@@ -351,7 +352,7 @@
             height: 24px;
             background: #007aff;
             color: white;
-            border-radius: 50%;
+            border-radius: 0%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -372,9 +373,9 @@
         .wind-down-duration {
             background: #007aff;
             padding: 28px;
-            border-radius: 20px;
+            border-radius: 0px;
             text-align: center;
-            min-width: 180px;
+            min-width: 250px;
             color: white;
             box-shadow: 0 8px 32px rgba(0, 122, 255, 0.3);
             position: relative;
@@ -428,7 +429,7 @@
         
         .upload-zone {
             border: 3px dashed #cbd5e0;
-            border-radius: 16px;
+            border-radius: 0px;
             padding: 40px;
             text-align: center;
             background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
@@ -484,7 +485,7 @@
             padding: 12px 20px;
             background: #007aff;
             color: white;
-            border-radius: 12px;
+            border-radius: 0px;
             font-size: 14px;
             font-weight: 500;
             display: none;
@@ -695,12 +696,7 @@
             }
             const recentRecords = allRecords.slice(-7);
             const sleepDurations = recentRecords.map(record => parseFloat(record.sleepDuration || 0));
-            
-          
-            
-            weeklyChart.data.labels = labels;
             weeklyChart.data.datasets[0].data = sleepDurations;
-
             weeklyChart.update();
             
             
@@ -722,13 +718,10 @@
             
             document.getElementById('stepCount').value = lastRecord.stepCount || 8500;
             document.getElementById('bedtime').value = lastRecord.bedtime || '22:30';
-
-        
             
             console.log(`Loaded sleep records`);
         };
     }
-
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
         let aiEngine = null;
@@ -835,7 +828,7 @@
                         label: 'Duration (Hours)',
                         data: [0, 0, 0, 0, 0, 0, 0], 
                         backgroundColor: 'rgba(0, 122, 255, 0.8)',
-                        borderRadius: 8,
+                        borderRadius: 0,
                         borderSkipped: false,
                     }]
                 },
@@ -1014,10 +1007,8 @@
                 sleepScore: document.getElementById('sleepScore').value,
                 stressLevel: document.getElementById('stressLevel').value,
                 stepCount: document.getElementById('stepCount').value,
-                bedtime: document.getElementById('bedtime').value,
-                date: new Date().toISOString()
+                bedtime: document.getElementById('bedtime').value
             };
-            saveSleepData(data);
 
             document.getElementById('dispScore').textContent = data.sleepScore;
             document.getElementById('dispDuration').textContent = data.sleepDuration + 'h';
