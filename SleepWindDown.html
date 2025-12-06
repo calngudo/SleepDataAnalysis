@@ -695,7 +695,12 @@
             }
             const recentRecords = allRecords.slice(-7);
             const sleepDurations = recentRecords.map(record => parseFloat(record.sleepDuration || 0));
+            
+          
+            
+            weeklyChart.data.labels = labels;
             weeklyChart.data.datasets[0].data = sleepDurations;
+
             weeklyChart.update();
             
             
@@ -717,6 +722,8 @@
             
             document.getElementById('stepCount').value = lastRecord.stepCount || 8500;
             document.getElementById('bedtime').value = lastRecord.bedtime || '22:30';
+
+        
             
             console.log(`Loaded sleep records`);
         };
@@ -791,7 +798,7 @@
                             * Average Stress Level: ${data.stressLevel}\n
                             * Average Daily Steps: ${data.stepCount}\n
                             * Average Bedtime: ${data.bedtime}\n\n
-                            Based on this data, what is your sleep recommendation? Keep it short and actionable.`;
+                            Based on this data, what is your sleep recommendation? (For the recommendation sentence, make it at least 3 sentences.)`;
             
             try {
                 const response = await aiEngine.chat.completions.create({
@@ -1007,7 +1014,8 @@
                 sleepScore: document.getElementById('sleepScore').value,
                 stressLevel: document.getElementById('stressLevel').value,
                 stepCount: document.getElementById('stepCount').value,
-                bedtime: document.getElementById('bedtime').value
+                bedtime: document.getElementById('bedtime').value,
+                date: new Date().toISOString()
             };
             saveSleepData(data);
 
