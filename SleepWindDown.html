@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +28,7 @@
         header {
             background: #fff;
             padding: 24px 32px;
-            border-radius: 20px;
+            border-radius: 16px;
             margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
@@ -49,7 +48,7 @@
             gap: 10px;
             background: #f8f9fa;
             padding: 8px 16px;
-            border-radius: 12px;
+            border-radius: 20px;
             font-size: 14px;
             font-weight: 500;
         }
@@ -57,7 +56,7 @@
         .status-indicator {
             width: 8px;
             height: 8px;
-            border-radius: 0%;
+            border-radius: 50%;
             background-color: #ccc;
         }
         
@@ -83,7 +82,7 @@
         .card {
             background: #fff;
             padding: 32px;
-            border-radius: 0px;
+            border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
@@ -112,7 +111,7 @@
         .input-card {
             background: #007aff;
             padding: 24px;
-            border-radius: 0px;
+            border-radius: 16px;
             color: white;
             position: relative;
             overflow: hidden;
@@ -160,7 +159,7 @@
         .input-card input[type=range] {
             width: 100%;
             height: 6px;
-            border-radius: 0px;
+            border-radius: 3px;
             background: rgba(255, 255, 255, 0.3);
             outline: none;
             -webkit-appearance: none;
@@ -186,7 +185,7 @@
         .input-card input[type=range]::-moz-range-thumb {
             width: 20px;
             height: 20px;
-            border-radius: 0%;
+            border-radius: 50%;
             background: white;
             cursor: pointer;
             border: none;
@@ -206,7 +205,7 @@
             width: 100%;
             padding: 16px;
             border: 2px solid #e2e8f0;
-            border-radius: 0px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 500;
             transition: all 0.2s;
@@ -224,7 +223,7 @@
             color: white;
             padding: 16px 32px;
             border: none;
-            border-radius: 0px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 16px;
             font-weight: 600;
@@ -263,7 +262,7 @@
         .metric-card {
             background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             padding: 24px;
-            border-radius: 0px;
+            border-radius: 16px;
             text-align: center;
             border: 2px solid #e2e8f0;
             transition: all 0.2s;
@@ -296,7 +295,7 @@
             height: 280px;
             background: white;
             padding: 20px;
-            border-radius: 0px;
+            border-radius: 16px;
             border: 2px solid #e2e8f0;
         }
         
@@ -308,7 +307,7 @@
         .recommendation {
             background: #e7f3ff;
             padding: 28px;
-            border-radius: 0px;
+            border-radius: 16px;
             border-left: 4px solid #007aff;
             line-height: 1.8;
             font-size: 15px;
@@ -352,7 +351,7 @@
             height: 24px;
             background: #007aff;
             color: white;
-            border-radius: 0%;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -373,9 +372,9 @@
         .wind-down-duration {
             background: #007aff;
             padding: 28px;
-            border-radius: 0px;
+            border-radius: 20px;
             text-align: center;
-            min-width: 250px;
+            min-width: 180px;
             color: white;
             box-shadow: 0 8px 32px rgba(0, 122, 255, 0.3);
             position: relative;
@@ -429,7 +428,7 @@
         
         .upload-zone {
             border: 3px dashed #cbd5e0;
-            border-radius: 0px;
+            border-radius: 16px;
             padding: 40px;
             text-align: center;
             background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
@@ -485,7 +484,7 @@
             padding: 12px 20px;
             background: #007aff;
             color: white;
-            border-radius: 0px;
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 500;
             display: none;
@@ -647,6 +646,82 @@
     </div>
 
     <script type="module">
+        let db = null;
+        let request = indexedDB.open("sleep_dataV2", 1);
+        request.onupgradeneeded = function(event) {
+            let db = event.target.result;
+            let objectStore = db.createObjectStore("sleep_records", { keyPath: "id", autoIncrement: true });
+            objectStore.createIndex("date", "date", { unique: false });
+        };
+        request.onsuccess = function(event) {
+            let db = event.target.result;
+            loadSleepData();
+        };
+        request.onerror = function(event) {
+            console.error("IndexedDB error:", event.target.errorCode);
+        };
+        function saveSleepData(data) {
+            if (!db){
+                console.error("DB not initialized yet");
+                return;
+            }
+            let transaction = db.transaction(["sleep_records"], "readwrite");
+            let objectStore = transaction.objectStore("sleep_records");
+
+            let request = objectStore.add(data);
+            request.onsuccess = function(event) {
+                console.log("Saved:", event.target.result);
+            };
+            request.onerror = function(event) {
+                console.error("Error saving", event.target.errorCode);
+            };
+        }
+    function loadSleepData() {
+        if (!db) {
+            console.error("DB not initialized yet");
+            return;
+        }
+        
+        let transaction = db.transaction(["sleep_records"], "readonly");
+        let objectStore = transaction.objectStore("sleep_records");
+        let getAllRequest = objectStore.getAll();
+        
+        getAllRequest.onsuccess = function(event) {
+            let allRecords = event.target.result;
+            
+            if (allRecords.length === 0) {
+                console.log("No existing sleep records");
+                return;
+            }
+            const recentRecords = allRecords.slice(-7);
+            const sleepDurations = recentRecords.map(record => parseFloat(record.sleepDuration || 0));
+            weeklyChart.data.datasets[0].data = sleepDurations;
+            weeklyChart.update();
+            
+            
+            // Update dashboard metrics
+            document.getElementById('dispScore').textContent = avgScore;
+            document.getElementById('dispDuration').textContent = avgSleep + 'h';
+            document.getElementById('dispQuality').textContent = avgScore >= 80 ? 'Excellent' : avgScore >= 60 ? 'Good' : 'Fair';
+            
+
+            const lastRecord = recentRecords[recentRecords.length - 1];
+            document.getElementById('sleepDuration').value = lastRecord.sleepDuration || 7.5;
+            document.getElementById('val-sleepDuration').textContent = (lastRecord.sleepDuration || 7.5) + 'h';
+            
+            document.getElementById('sleepScore').value = lastRecord.sleepScore || 75;
+            document.getElementById('val-sleepScore').textContent = lastRecord.sleepScore || 75;
+            
+            document.getElementById('stressLevel').value = lastRecord.stressLevel || 30;
+            document.getElementById('val-stressLevel').textContent = lastRecord.stressLevel || 30;
+            
+            document.getElementById('stepCount').value = lastRecord.stepCount || 8500;
+            document.getElementById('bedtime').value = lastRecord.bedtime || '22:30';
+            
+            console.log(`Loaded sleep records`);
+        };
+    }
+
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
         let aiEngine = null;
@@ -716,7 +791,7 @@
                             * Average Stress Level: ${data.stressLevel}\n
                             * Average Daily Steps: ${data.stepCount}\n
                             * Average Bedtime: ${data.bedtime}\n\n
-                            Based on this data, what is your sleep recommendation? (For the recommendation sentence, make it at least 3 sentences.)`;
+                            Based on this data, what is your sleep recommendation? Keep it short and actionable.`;
             
             try {
                 const response = await aiEngine.chat.completions.create({
@@ -753,7 +828,7 @@
                         label: 'Duration (Hours)',
                         data: [0, 0, 0, 0, 0, 0, 0], 
                         backgroundColor: 'rgba(0, 122, 255, 0.8)',
-                        borderRadius: 0,
+                        borderRadius: 8,
                         borderSkipped: false,
                     }]
                 },
@@ -934,6 +1009,7 @@
                 stepCount: document.getElementById('stepCount').value,
                 bedtime: document.getElementById('bedtime').value
             };
+            saveSleepData(data);
 
             document.getElementById('dispScore').textContent = data.sleepScore;
             document.getElementById('dispDuration').textContent = data.sleepDuration + 'h';
