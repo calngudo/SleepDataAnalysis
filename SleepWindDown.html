@@ -656,6 +656,7 @@
         };
         request.onsuccess = function(event) {
             db = event.target.result;
+           
             loadSleepData();
         };
         request.onerror = function(event) {
@@ -679,6 +680,7 @@
         }
     function loadSleepData() {
         if (!db) {
+            
             console.error("DB not initialized yet");
             return;
         }
@@ -928,7 +930,7 @@
                     
                     // Simulate processing and populate with sample data
                     setTimeout(() => {
-                        populateSampleHealthData();
+                        //populateSampleHealthData();
                         fileStatus.textContent = `✅ Health data imported from ${file.name} - 7 days of sleep data loaded`;
                     }, 1000);
                     
@@ -1009,6 +1011,10 @@
                 stepCount: document.getElementById('stepCount').value,
                 bedtime: document.getElementById('bedtime').value
             };
+            saveSleepData({
+                date: new Date().toISOString(),
+                ...data
+            });
 
             document.getElementById('dispScore').textContent = data.sleepScore;
             document.getElementById('dispDuration').textContent = data.sleepDuration + 'h';
