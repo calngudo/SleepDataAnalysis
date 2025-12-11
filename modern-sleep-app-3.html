@@ -646,6 +646,82 @@
     </div>
 
     <script type="module">
+        let db = null;
+        let request = indexedDB.open("sleep_dataV2", 1);
+        request.onupgradeneeded = function(event) {
+            let db = event.target.result;
+            let objectStore = db.createObjectStore("sleep_records", { keyPath: "id", autoIncrement: true });
+            objectStore.createIndex("date", "date", { unique: false });
+        };
+        request.onsuccess = function(event) {
+            let db = event.target.result;
+            loadSleepData();
+        };
+        request.onerror = function(event) {
+            console.error("IndexedDB error:", event.target.errorCode);
+        };
+        function saveSleepData(data) {
+            if (!db){
+                console.error("DB not initialized yet");
+                return;
+            }
+            let transaction = db.transaction(["sleep_records"], "readwrite");
+            let objectStore = transaction.objectStore("sleep_records");
+
+            let request = objectStore.add(data);
+            request.onsuccess = function(event) {
+                console.log("Saved:", event.target.result);
+            };
+            request.onerror = function(event) {
+                console.error("Error saving", event.target.errorCode);
+            };
+        }
+    function loadSleepData() {
+        if (!db) {
+            console.error("DB not initialized yet");
+            return;
+        }
+        
+        let transaction = db.transaction(["sleep_records"], "readonly");
+        let objectStore = transaction.objectStore("sleep_records");
+        let getAllRequest = objectStore.getAll();
+        
+        getAllRequest.onsuccess = function(event) {
+            let allRecords = event.target.result;
+            
+            if (allRecords.length === 0) {
+                console.log("No existing sleep records");
+                return;
+            }
+            const recentRecords = allRecords.slice(-7);
+            const sleepDurations = recentRecords.map(record => parseFloat(record.sleepDuration || 0));
+            weeklyChart.data.datasets[0].data = sleepDurations;
+            weeklyChart.update();
+            
+            
+            // Update dashboard metrics
+            document.getElementById('dispScore').textContent = avgScore;
+            document.getElementById('dispDuration').textContent = avgSleep + 'h';
+            document.getElementById('dispQuality').textContent = avgScore >= 80 ? 'Excellent' : avgScore >= 60 ? 'Good' : 'Fair';
+            
+
+            const lastRecord = recentRecords[recentRecords.length - 1];
+            document.getElementById('sleepDuration').value = lastRecord.sleepDuration || 7.5;
+            document.getElementById('val-sleepDuration').textContent = (lastRecord.sleepDuration || 7.5) + 'h';
+            
+            document.getElementById('sleepScore').value = lastRecord.sleepScore || 75;
+            document.getElementById('val-sleepScore').textContent = lastRecord.sleepScore || 75;
+            
+            document.getElementById('stressLevel').value = lastRecord.stressLevel || 30;
+            document.getElementById('val-stressLevel').textContent = lastRecord.stressLevel || 30;
+            
+            document.getElementById('stepCount').value = lastRecord.stepCount || 8500;
+            document.getElementById('bedtime').value = lastRecord.bedtime || '22:30';
+            
+            console.log(`Loaded sleep records`);
+        };
+    }
+
         import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
         let aiEngine = null;
@@ -933,6 +1009,7 @@
                 stepCount: document.getElementById('stepCount').value,
                 bedtime: document.getElementById('bedtime').value
             };
+            saveSleepData(data);
 
             document.getElementById('dispScore').textContent = data.sleepScore;
             document.getElementById('dispDuration').textContent = data.sleepDuration + 'h';
